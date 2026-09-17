@@ -12,7 +12,7 @@ const LevantamientoFlotaMockup: React.FC = () => {
         { id: 'electrico', label: 'Eléctrico/Interiores' },
         { id: 'equipo', label: 'Equipo Adicional' },
     ];
-
+//hola
     return (
         <div className={styles.mockupContainer}>
             {/* WATERMARK */}
