@@ -7,7 +7,7 @@ import { ModalProvider } from "./context/ModalContext";
 import CustomModal from "./components/common/CustomModal";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-
+//public 2
 // PUBLIC
 import Home from "./pages/public/Home";
 import AuthPage from "./pages/auth/AuthPage"; // Import AuthPage
