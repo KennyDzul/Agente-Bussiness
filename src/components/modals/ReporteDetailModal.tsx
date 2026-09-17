@@ -87,6 +87,65 @@ const ReporteDetailModal: React.FC<ReporteDetailModalProps> = ({
     // Determinar si es un pre-reporte (falta firma o es local)
     const isPreReport = !reporte?.id && !!reporte; 
 
+    const downloadFile = async (urlOrData: string, defaultName: string) => {
+        try {
+            if (urlOrData.startsWith('data:')) {
+                const link = document.createElement('a');
+                link.href = urlOrData;
+                link.download = defaultName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                return;
+            }
+
+            const response = await fetch(urlOrData);
+            if (!response.ok) throw new Error('Fetch failed');
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = defaultName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (e) {
+            const link = document.createElement('a');
+            link.href = urlOrData;
+            link.download = defaultName;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
+    const handleDownloadReporte = async () => {
+        if (!reporte) return;
+
+        const firma = reporte.firmaEmpresa;
+        if (firma && firma !== '__PDF_LOADED_IN_STATE__') {
+            let ext = 'jpg';
+            if (firma.startsWith('data:application/pdf') || firma.toLowerCase().includes('.pdf')) {
+                ext = 'pdf';
+            } else if (firma.startsWith('data:image/png') || firma.toLowerCase().includes('.png')) {
+                ext = 'png';
+            } else if (firma.startsWith('data:image/webp') || firma.toLowerCase().includes('.webp')) {
+                ext = 'webp';
+            } else if (firma.startsWith('data:image/jpeg') || firma.toLowerCase().includes('.jpeg') || firma.toLowerCase().includes('.jpg')) {
+                ext = 'jpg';
+            }
+
+            const fileName = `Reporte_Firmado_${reporte.id || task?.id || 'servicio'}.${ext}`;
+            await downloadFile(firma, fileName);
+            return;
+        }
+
+        await handleDownloadPDF();
+    };
+
     const handleDownloadPDF = async () => {
         if (!reporte) return;
         try {
@@ -138,10 +197,11 @@ const ReporteDetailModal: React.FC<ReporteDetailModalProps> = ({
                         {reporte && (
                             <button
                                 className={styles.downloadPdfBtn}
-                                onClick={handleDownloadPDF}
+                                onClick={handleDownloadReporte}
+                                title={reporte?.firmaEmpresa && reporte.firmaEmpresa !== '__PDF_LOADED_IN_STATE__' ? "Descargar Reporte Firmado" : "Descargar PDF"}
                             >
                                 <HiOutlineArrowDownTray size={18} />
-                                <span>Descargar PDF</span>
+                                <span>{reporte?.firmaEmpresa && reporte.firmaEmpresa !== '__PDF_LOADED_IN_STATE__' ? "Descargar Reporte" : "Descargar PDF"}</span>
                             </button>
                         )}
                         {onEdit && (userRole === 'admin' || userRole === 'tecnico') && (
@@ -377,13 +437,12 @@ const ReporteDetailModal: React.FC<ReporteDetailModalProps> = ({
                                         </div>
                                         <span style={{ fontSize: '13px', color: '#374151', fontWeight: '600' }}>Reporte PDF con firma y sello</span>
                                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                            <a
-                                                href={reporte.firmaEmpresa}
-                                                download={`Reporte_Firmado_${reporte?.id || ''}.pdf`}
-                                                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f26522', color: '#fff', padding: '8px 18px', borderRadius: '20px', fontSize: '13px', fontWeight: '700', textDecoration: 'none', cursor: 'pointer' }}
+                                            <button
+                                                onClick={handleDownloadReporte}
+                                                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f26522', color: '#fff', padding: '8px 18px', borderRadius: '20px', fontSize: '13px', fontWeight: '700', border: 'none', cursor: 'pointer' }}
                                             >
                                                 ⬇️ Descargar PDF
-                                            </a>
+                                            </button>
                                             <button
                                                 onClick={() => {
                                                     const win = window.open('', '_blank');
@@ -399,13 +458,21 @@ const ReporteDetailModal: React.FC<ReporteDetailModalProps> = ({
                                         </div>
                                     </div>
                                 ) : (
-                                    /* Imagen: mantener el visor con zoom */
-                                    <img
-                                        src={reporte.firmaEmpresa}
-                                        alt="Reporte Firmado"
-                                        style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', cursor: 'zoom-in', borderRadius: '8px' }}
-                                        onClick={() => setSelectedZoomImage(reporte.firmaEmpresa)}
-                                    />
+                                    /* Imagen: mantener el visor con zoom y botón de descarga */
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                                        <img
+                                            src={reporte.firmaEmpresa}
+                                            alt="Reporte Firmado"
+                                            style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', cursor: 'zoom-in', borderRadius: '8px' }}
+                                            onClick={() => setSelectedZoomImage(reporte.firmaEmpresa)}
+                                        />
+                                        <button
+                                            onClick={handleDownloadReporte}
+                                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f26522', color: '#fff', padding: '6px 16px', borderRadius: '20px', fontSize: '13px', fontWeight: '700', border: 'none', cursor: 'pointer' }}
+                                        >
+                                            <HiOutlineArrowDownTray size={16} /> Descargar Imagen
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         </div>
