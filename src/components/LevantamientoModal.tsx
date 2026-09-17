@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './LevantamientoModal.module.css';
 import { 
     HiOutlineXMark, 
@@ -411,7 +412,7 @@ const LevantamientoModal: React.FC<LevantamientoModalProps> = ({ isOpen, onClose
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{ maxWidth: '960px' }}>
                 <div className={styles.modalHeader}>
@@ -830,7 +831,8 @@ const LevantamientoModal: React.FC<LevantamientoModalProps> = ({ isOpen, onClose
                     } : undefined}
                 />
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

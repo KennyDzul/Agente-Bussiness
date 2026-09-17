@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './DetalleEquipoModal.module.css';
 import { 
     HiOutlinePencilSquare,
@@ -51,7 +52,7 @@ const DetalleEquipoModal: React.FC<DetalleEquipoModalProps> = ({ isOpen, onClose
 
     const currentEq = equipmentList[currentIndex];
 
-    return (
+    return createPortal(
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
@@ -169,7 +170,8 @@ const DetalleEquipoModal: React.FC<DetalleEquipoModalProps> = ({ isOpen, onClose
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { HiOutlineHome } from 'react-icons/hi2';
 import styles from './ModalSeleccionEspacio.module.css';
 
@@ -58,7 +59,7 @@ const ModalSeleccionEspacio: React.FC<ModalSeleccionEspacioProps> = ({
 
     const isAddDisabled = !selectedOption || (selectedOption === 'OTRO' && !customValue.trim());
 
-    return (
+    return createPortal(
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <div className={styles.header}>
@@ -114,7 +115,8 @@ const ModalSeleccionEspacio: React.FC<ModalSeleccionEspacioProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
