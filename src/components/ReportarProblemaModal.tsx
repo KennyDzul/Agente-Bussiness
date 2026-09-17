@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './LevantamientoModal.module.css'; // Podemos reusar algunos estilos
 import { HiOutlineExclamationTriangle } from "react-icons/hi2";
 import type { Equipment } from '../pages/cliente/PerfilEmpresa';
@@ -36,7 +37,7 @@ const ReportarProblemaModal: React.FC<ReportarProblemaModalProps> = ({
         }
     };
 
-    return (
+    return createPortal(
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
                 <div className={styles.modalHeader} style={{ background: '#fef3c7', borderBottom: '1px solid #fde68a' }}>
@@ -107,7 +108,8 @@ const ReportarProblemaModal: React.FC<ReportarProblemaModalProps> = ({
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

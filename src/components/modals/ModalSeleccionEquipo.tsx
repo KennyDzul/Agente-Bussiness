@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { HiOutlineWrenchScrewdriver } from 'react-icons/hi2';
 import type { Equipment } from '../../pages/cliente/PerfilEmpresa';
 
@@ -19,7 +20,7 @@ const ModalSeleccionEquipo: React.FC<ModalSeleccionEquipoProps> = ({
 }) => {
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div style={overlayStyle} onClick={onClose}>
             <div style={modalStyle} onClick={e => e.stopPropagation()}>
                 <div style={headerStyle}>
@@ -44,7 +45,8 @@ const ModalSeleccionEquipo: React.FC<ModalSeleccionEquipoProps> = ({
                 </div>
                 <button style={closeBtnStyle} onClick={onClose}>Cancelar</button>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
@@ -54,7 +56,7 @@ export default ModalSeleccionEquipo;
 const overlayStyle: React.CSSProperties = {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
     background: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200
+    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000
 };
 const modalStyle: React.CSSProperties = {
     background: '#fff', width: '90%', maxWidth: '500px',
